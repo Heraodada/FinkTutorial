@@ -1,6 +1,6 @@
 package com.atguigu.chapter05;
 
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import  org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -59,7 +59,7 @@ public class SourceTest {
 
 
         //从kafka消费数据
-        DataStreamSource<String> kafkaSteram = env.addSource(new FlinkKafkaConsumer<String>("clicks", new SimpleStringSchema(), properties));
+        DataStreamSource<String> kafkaSteram = env.addSource(new FlinkKafkaConsumer<String>("test", new SimpleStringSchema(), properties));
         kafkaSteram.print("kafka");
 
 
