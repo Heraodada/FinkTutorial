@@ -1,7 +1,7 @@
 package com.atguigu.chapter;
 
 import org.apache.flink.streaming.api.functions.source.ParallelSourceFunction;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
+
 
 import java.util.Calendar;
 import java.util.Random;
