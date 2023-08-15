@@ -39,6 +39,8 @@ public class UvCountByWindowExample {
         env.execute();
     }
     public static class UvCountByWindow extends ProcessWindowFunction<Event,String,Boolean, TimeWindow> {
+
+
         @Override
         public void process(Boolean aBoolean, ProcessWindowFunction<Event, String, Boolean, TimeWindow>.Context context, Iterable<Event> iterable, Collector<String> collector) throws Exception {
             HashSet<String> userSet = new HashSet<>();
