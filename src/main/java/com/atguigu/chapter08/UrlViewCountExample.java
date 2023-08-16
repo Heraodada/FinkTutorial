@@ -6,15 +6,13 @@ import com.atguigu.chapter.Event;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.AggregateFunction;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.scala.function.ProcessWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
-import scala.collection.Iterable;
 
 import java.sql.Timestamp;
 import java.time.Duration;
@@ -62,14 +60,16 @@ public class UrlViewCountExample {
         }
     }
 
-    public static class UvCountByWindoeResult extends ProcessWindowFunction<Long,UrlViewCount,String, TimeWindow>{
+    public static class UvCountByWindoeResult extends ProcessWindowFunction<Long,UrlViewCount, String, TimeWindow>{
 
         @Override
-        public void process(String s, ProcessWindowFunction<Long, UrlViewCount, String, TimeWindow>.Context context, Iterable<Long> elements, Collector<UrlViewCount> out) throws Exception {
-            long start = context.window().getStart();
-            long end = context.window().getEnd();
-
-            out.collect(new UrlViewCount(s,elements.iterator().next(),start,end));
+        public void process(String url, ProcessWindowFunction<Long, UrlViewCount, String, TimeWindow>.Context context, Iterable<Long> elements, Collector<UrlViewCount> collector) throws Exception {
+            // 结合窗口信息，包装输出内容
+            Long start = context.window().getStart();
+            Long end = context.window().getEnd();
+            // 迭代器中只有一个元素，就是增量聚合函数的计算结果
+            collector.collect(new UrlViewCount(url, elements.iterator().next(), start,
+                    end));
         }
     }
 
