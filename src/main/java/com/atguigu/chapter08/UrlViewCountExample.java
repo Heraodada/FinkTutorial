@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 import java.time.Duration;
 
 public class UrlViewCountExample {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
 
@@ -33,7 +33,9 @@ public class UrlViewCountExample {
         // 需要按照 url 分组，开滑动窗口统计
         stream.keyBy(data -> data.url)
                 .window(SlidingEventTimeWindows.of(Time.seconds(10),Time.seconds(5)))
-                .aggregate(new UrlViewCountAgg(),new UvCountByWindoeResult());
+                .aggregate(new UrlViewCountAgg(),new UvCountByWindoeResult()).print();
+
+        env.execute();
 
     }
 
@@ -68,8 +70,34 @@ public class UrlViewCountExample {
             Long start = context.window().getStart();
             Long end = context.window().getEnd();
             // 迭代器中只有一个元素，就是增量聚合函数的计算结果
-            collector.collect(new UrlViewCount(url, elements.iterator().next(), start,
-                    end));
+            collector.collect(new UrlViewCount(url, elements.iterator().next(), start, end));
+        }
+    }
+    public  static class UrlViewCount {
+        public String url;
+        public Long count;
+        public Long windowStart;
+        public Long windowEnd;
+
+        public UrlViewCount() {
+        }
+
+        public UrlViewCount(String url, Long count, Long windowStart, Long windowEnd) {
+            this.url = url;
+            this.count = count;
+            this.windowStart = windowStart;
+            this.windowEnd = windowEnd;
+        }
+
+        @Override
+        public String toString() {
+            return "UrlViewCount{" +
+                    "url='" + url + '\'' +
+                    ", count=" + count +
+                    ", windowStart=" + new Timestamp(windowStart) +
+                    ", windowEnd=" + new Timestamp(windowEnd) +
+                    '}';
+
         }
     }
 
